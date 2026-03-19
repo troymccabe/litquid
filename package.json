@@ -1,0 +1,22 @@
+{
+  "name": "litquid-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LitQuid - Liquid to Lit template pipeline with SSR hydration",
+  "workspaces": [
+    "litquid/runtime",
+    "liquid/clientTemplateValue/typescript"
+  ],
+  "scripts": {
+    "build:runtime": "cd litquid/runtime && npm run build",
+    "build:liquid-ts": "cd liquid/clientTemplateValue/typescript && npm run build",
+    "build:liquid-dotnet": "cd liquid/clientTemplateValue/dotnet && dotnet build",
+    "build:toolchain": "cd litquid/toolchain && cargo build --release",
+    "build": "npm run build:runtime && npm run build:liquid-ts && npm run build:toolchain",
+    "test:rust": "cd litquid/toolchain && cargo test",
+    "sample:dotnet": "cd litquid/samples/dotnet && dotnet run",
+    "preprocess": "cd litquid/toolchain && cargo run --bin litquid --",
+    "watch": "cd litquid/toolchain && cargo run --bin litquid-watch --"
+  },
+  "license": "MIT"
+}

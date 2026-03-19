@@ -1,0 +1,46 @@
+{
+  "name": "@litquid/runtime",
+  "version": "1.0.0",
+  "description": "LitQuid runtime - SSR hydration support for Lit components",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./bundle": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/litquid-element.bundle.js",
+      "default": "./dist/litquid-element.bundle.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && npm run bundle",
+    "bundle": "esbuild src/index.ts --bundle --format=esm --external:lit --outfile=dist/litquid-element.bundle.js",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "lit": "^3.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0",
+    "lit": "^3.1.0",
+    "typescript": "^5.3.0"
+  },
+  "keywords": [
+    "lit",
+    "ssr",
+    "hydration",
+    "web-components",
+    "litquid"
+  ],
+  "license": "MIT"
+}

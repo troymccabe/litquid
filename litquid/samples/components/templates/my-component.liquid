@@ -1,0 +1,32 @@
+<template shadowrootmode="open">
+  <style>
+    :host {
+      display: block;
+      font-family: sans-serif;
+    }
+    .user-card {
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+    h2 {
+      margin: 0 0 0.5rem 0;
+      color: #333;
+    }
+    p {
+      margin: 0.25rem 0;
+      color: #666;
+    }
+    .greeting {
+      display: inline-block;
+      margin-top: 0.5rem;
+      color: #0066cc;
+    }
+  </style>
+  <div class="user-card">
+    <h2>{{ firstName | capitalize | clientTemplateValue: "${this.firstName}" }} {{ lastName | clientTemplateValue: "${this.lastName}" }}</h2>
+    <p>Age: {{ age | plus: 1 | clientTemplateValue: "fake" }}!</p>
+    <span class="greeting">Welcome!</span>
+  </div>
+</template>

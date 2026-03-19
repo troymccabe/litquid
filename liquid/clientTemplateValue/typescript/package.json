@@ -1,0 +1,37 @@
+{
+  "name": "@litquid/liquid-clienttemplatevalue",
+  "version": "1.0.0",
+  "description": "LitQuid Liquid filter for marking client-side template values",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "liquidjs": "^10.0.0"
+  },
+  "devDependencies": {
+    "liquidjs": "^10.10.0",
+    "typescript": "^5.3.0"
+  },
+  "keywords": [
+    "liquid",
+    "liquidjs",
+    "filter",
+    "litquid",
+    "ssr"
+  ],
+  "license": "MIT"
+}

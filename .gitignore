@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+target/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Generated files
+*.template.js.bak
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Generated templates
+litquid/samples/components/scripts/templates/

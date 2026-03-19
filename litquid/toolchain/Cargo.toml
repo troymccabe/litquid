@@ -1,0 +1,23 @@
+[package]
+name = "litquid"
+version = "0.1.0"
+edition = "2021"
+description = "LitQuid preprocessor - converts Liquid templates to Lit template modules"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+walkdir = "2.4"
+notify = "6.1"
+tiny_http = "0.12"
+
+[[bin]]
+name = "litquid"
+path = "src/main.rs"
+
+[[bin]]
+name = "litquid-watch"
+path = "src/watch.rs"
+

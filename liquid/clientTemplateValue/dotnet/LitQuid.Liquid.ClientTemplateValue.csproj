@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>LitQuid.Liquid.ClientTemplateValue</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Troy McCabe</Authors>
+    <Description>LitQuid Liquid filter for marking client-side template values</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotLiquid" Version="2.2.692" />
+  </ItemGroup>
+
+</Project>
