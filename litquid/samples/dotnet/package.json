@@ -13,6 +13,7 @@
     "dev": "npm-run-all --parallel watch:js watch:css watch:rust"
   },
   "dependencies": {
+    "@lit-labs/ssr-client": "^1.1.0",
     "@litquid/runtime": "file:../../runtime",
     "lit": "^3.1.0"
   },

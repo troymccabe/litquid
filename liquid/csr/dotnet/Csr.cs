@@ -4,9 +4,9 @@ namespace LitQuid.Liquid.Filters
 {
     /// <summary>
     /// LitQuid Liquid filter for marking client-side template values.
-    /// Usage: {{ value | clientTemplateValue: "${this.propertyName}" }}
+    /// Usage: {{ value | csr: "${this.propertyName}" }}
     /// </summary>
-    public static class ClientTemplateValue
+    public static class CsrFilter
     {
         /// <summary>
         /// A noop filter that acts as a marker for build-time extraction.
@@ -15,12 +15,14 @@ namespace LitQuid.Liquid.Filters
         /// </summary>
         /// <param name="input">The input value to pass through.</param>
         /// <param name="clientExpression">The client-side expression (ignored at runtime, used by preprocessor).</param>
-        /// <returns>The string representation of the input, or empty string if null.</returns>
-        public static string ClientTemplateValueFilter(object input, string clientExpression = "")
+        /// <returns>The string representation of the input, wrapped in lit-part markers.</returns>
+        public static string Csr(object input, string clientExpression = "")
         {
-            // The clientExpression is only used by the Rust preprocessor
-            // At runtime, we just return the server-rendered value
-            return input?.ToString() ?? string.Empty;
+            // clientExpression is only used by the Rust preprocessor at build time.
+            // At SSR runtime we wrap the value in lit-part markers so @lit-labs/ssr-client
+            // can adopt the server-rendered DOM and apply reactivity on hydration.
+            var rendered = input?.ToString() ?? string.Empty;
+            return $"<!--lit-part-->{rendered}<!--/lit-part-->";
         }
 
         /// <summary>
@@ -29,7 +31,7 @@ namespace LitQuid.Liquid.Filters
         /// </summary>
         public static void Register()
         {
-            Template.RegisterFilter(typeof(ClientTemplateValue));
+            Template.RegisterFilter(typeof(CsrFilter));
         }
     }
 }

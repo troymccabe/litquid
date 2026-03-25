@@ -5,16 +5,16 @@
   "description": "LitQuid - Liquid to Lit template pipeline with SSR hydration",
   "workspaces": [
     "litquid/runtime",
-    "liquid/clientTemplateValue/typescript"
+    "liquid/csr/typescript"
   ],
   "scripts": {
     "build:runtime": "cd litquid/runtime && npm run build",
-    "build:liquid-ts": "cd liquid/clientTemplateValue/typescript && npm run build",
-    "build:liquid-dotnet": "cd liquid/clientTemplateValue/dotnet && dotnet build",
+    "build:liquid-ts": "cd liquid/csr/typescript && npm run build",
+    "build:liquid-dotnet": "cd liquid/csr/dotnet && dotnet build",
     "build:toolchain": "cd litquid/toolchain && cargo build --release",
     "build": "npm run build:runtime && npm run build:liquid-ts && npm run build:toolchain",
     "test:rust": "cd litquid/toolchain && cargo test",
-    "sample:dotnet": "cd litquid/samples/dotnet && dotnet run",
+    "sample:dotnet": "dotnet run --project litquid/samples/dotnet",
     "preprocess": "cd litquid/toolchain && cargo run --bin litquid --",
     "watch": "cd litquid/toolchain && cargo run --bin litquid-watch --"
   },

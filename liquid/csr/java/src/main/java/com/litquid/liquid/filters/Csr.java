@@ -11,20 +11,22 @@ import liqp.filters.Filter;
  *
  * Usage in .liquid templates:
  * <pre>
- * {{ firstName | clientTemplateValue: "${this.firstName}" }}
+ * {{ firstName | csr: "${this.firstName}" }}
  * </pre>
  */
-public class ClientTemplateValue extends Filter {
+public class Csr extends Filter {
 
-    public ClientTemplateValue() {
-        super("clientTemplateValue");
+    public Csr() {
+        super("csr");
     }
 
     @Override
     public Object apply(Object value, Object... params) {
-        // Pass through the value unchanged
-        // params[0] would be the client expression string, but we ignore it at runtime
-        return value == null ? "" : value.toString();
+        // params[0] would be the client expression string, but we ignore it at runtime.
+        // We wrap the value in lit-part markers so @lit-labs/ssr-client can adopt the
+        // server-rendered DOM and apply reactivity on hydration.
+        String rendered = value == null ? "" : value.toString();
+        return "<!--lit-part-->" + rendered + "<!--/lit-part-->";
     }
 
     /**
@@ -32,7 +34,7 @@ public class ClientTemplateValue extends Filter {
      *
      * @return a new instance of the filter for registration
      */
-    public static ClientTemplateValue create() {
-        return new ClientTemplateValue();
+    public static Csr create() {
+        return new Csr();
     }
 }

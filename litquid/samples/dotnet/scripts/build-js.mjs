@@ -31,6 +31,19 @@ async function build() {
         console.error('Failed to run litquid preprocessor:', err.message);
     }
 
+    // Also emit C# server-side render functions into the dotnet sample project.
+    // MSBuild picks up *.cs files automatically — no csproj changes needed.
+    const generatedDir = path.resolve(__dirname, '../Generated');
+    fs.mkdirSync(generatedDir, { recursive: true });
+    try {
+        execSync(
+            `cargo run --bin litquid -- --input "${templatesInput}" --output "${generatedDir}" --emit csharp --namespace Sample.Generated`,
+            { cwd: toolchainDir, stdio: 'inherit', shell: true }
+        );
+    } catch (err) {
+        console.error('Failed to run litquid preprocessor (csharp emit):', err.message);
+    }
+
     // 2. Build component scripts from shared components directory (templates are bundled in)
     const scriptsDir = path.join(componentsDir, 'scripts');
 
@@ -44,6 +57,8 @@ async function build() {
                 bundle: true,
                 format: 'esm',
                 minify: true,
+                // Components live outside the npm root; tell esbuild where packages are.
+                nodePaths: [path.join(rootDir, 'node_modules')],
             });
             console.log(`Built: ${script.replace(/\.ts$/, '.js')}`);
         }

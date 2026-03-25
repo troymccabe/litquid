@@ -3,35 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LitQuid - SSR + CSR Demo</title>
+    <title>LitQuid &mdash; SSR Hydration Demo</title>
+    <link rel="stylesheet" href="/dist/css/styles.css">
+    <meta name="ssr-time-ms" content="{{SSR_TIME_MS}}">
 </head>
 <body>
-    <h1>LitQuid SSR + CSR Demo</h1>
-    <p>This page demonstrates the same component rendered both server-side (SSR) and client-side (CSR).</p>
 
-    <div class="demo-section">
-        <span class="label label-ssr">SSR</span>
-        <h2>Server-Side Rendered</h2>
-        <p>This component was rendered on the server using DotLiquid. The HTML arrived fully formed.</p>
-        <my-component ssr>
-            {{SSR_CONTENT}}
-        </my-component>
+<header class="site-header">
+    <h1>LitQuid</h1>
+    <p class="tagline">Liquid templates &rarr; Lit SSR + hydration, without Node</p>
+</header>
+
+<div class="perf-bar">
+    <span class="perf-pill perf-ssr" title="DotLiquid rendered all Liquid-path components server-side">
+        Liquid SSR: <strong id="ssr-ms">{{SSR_TIME_MS}}ms</strong>
+    </span>
+    <span class="perf-pill perf-gen" title="Generated renderer rendered all build-time-path components server-side">
+        Generated SSR: <strong id="gen-ms">{{GEN_TIME_MS}}ms</strong>
+    </span>
+    <span class="perf-pill perf-hydration" id="hydration-pill">
+        Hydration: <strong id="hydration-ms">&hellip;</strong>
+    </span>
+    <span class="perf-pill perf-note">
+        Throttle Network &rarr; SSR visible before JS loads
+    </span>
+</div>
+
+<div class="demo-controls">
+    <button id="increment-btn" class="control-btn" disabled>
+        Age everyone +1
+    </button>
+    <span class="control-hint" id="control-hint">
+        (waiting for Lit hydration&hellip;)
+    </span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ Stats section -->
+<section class="demo-section">
+    <div class="section-header">
+        <span class="badge badge-mixed">Mixed &middot; stat-card</span>
+        <div>
+            <h2>Team Stats &mdash; stat-card rendered four ways</h2>
+            <p>
+                Four <code>stat-card</code> elements, four strategies in one grid.
+                Card 1: <strong class="tag-gen">SSR &middot; Generated</strong> &mdash; digest baked in at build time.
+                Card 2: <strong class="tag-ssr">SSR &middot; Liquid</strong> &mdash; DotLiquid + csr filter at request time.
+                Card 3: <strong class="tag-gen">SSR &middot; Generated</strong>.
+                Card 4: <strong class="tag-csr">CSR</strong> &mdash; empty in the HTTP response, rendered by JS.
+            </p>
+        </div>
     </div>
-
-    <div class="demo-section">
-        <span class="label label-csr">CSR</span>
-        <h2>Client-Side Rendered</h2>
-        <p>This component will be rendered on the client using Lit. Watch it hydrate!</p>
-        <my-component
-            firstName="Jane"
-            lastName="Smith"
-            age="25">
-        </my-component>
+    <div class="card-grid card-grid--stats">
+        {{STAT_CARDS}}
     </div>
+</section>
 
-    <script type="module" src="/dist/js/my-component.js"></script>
+<!-- ══════════════════════════════════════════════════════ Mixed team section -->
+<section class="demo-section">
+    <div class="section-header">
+        <span class="badge badge-mixed">Mixed &middot; my-component</span>
+        <div>
+            <h2>Team Members &mdash; three render strategies, one grid</h2>
+            <p>
+                Eight <code>my-component</code> cards, three strategies.
+                Cards 1&ndash;3: <strong class="tag-ssr">SSR &middot; Liquid</strong> (DotLiquid, parallel async).
+                Cards 4&ndash;6: <strong class="tag-gen">SSR &middot; Generated</strong> (emitted C# renderer, synchronous).
+                Cards 7&ndash;8: <strong class="tag-csr">CSR</strong> (empty in HTTP response &mdash; View Source to compare).
+                All SSR cards hydrate with <code>@lit-labs/ssr-client</code>; the button updates every card reactively.
+            </p>
+        </div>
+    </div>
+    <div class="card-grid">
+        {{MIXED_CARDS}}
+    </div>
+</section>
 
-    <!-- Live reload for development -->
-    <script src="http://localhost:35729/livereload.js"></script>
+<script type="module" src="/dist/js/my-component.js"></script>
+<script type="module" src="/dist/js/stat-card.js"></script>
+<script>
+    const t0 = performance.now();
+
+    Promise.all([
+        customElements.whenDefined('my-component'),
+        customElements.whenDefined('stat-card'),
+    ]).then(() => {
+        requestAnimationFrame(() => {
+            const ms = Math.round(performance.now() - t0);
+            document.getElementById('hydration-ms').textContent = ms + 'ms';
+            document.getElementById('hydration-pill').classList.add('ready');
+
+            const btn  = document.getElementById('increment-btn');
+            const hint = document.getElementById('control-hint');
+            btn.disabled = false;
+            hint.textContent = '(updates all SSR-hydrated and CSR my-component cards)';
+
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('my-component').forEach((el, i) => {
+                    el.age = (el.age || 0) + 1;
+                    el.requestUpdate?.();
+                });
+            });
+        });
+    });
+</script>
+
+<!-- Live reload for development -->
+<script src="http://localhost:35729/livereload.js" onerror="this.remove()"></script>
 </body>
 </html>

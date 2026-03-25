@@ -8,7 +8,7 @@ use std::thread;
 use std::time::Duration;
 use tiny_http::{Response, Server};
 
-use litquid::{process_liquid_file, DEFAULT_LIT_IMPORT};
+use litquid::{codegen::{build_emitters, TargetEmitter}, process_liquid_file, DEFAULT_LIT_IMPORT};
 
 /// LitQuid Watch Server - File watcher with SSE live reload
 #[derive(Parser, Debug)]
@@ -29,6 +29,14 @@ struct Args {
     /// Import path for Lit (e.g., "lit", "https://cdn.jsdelivr.net/npm/lit@3/+esm")
     #[arg(long, default_value = DEFAULT_LIT_IMPORT)]
     lit_import: String,
+
+    /// Additional server-side render targets (comma-separated). Supported: csharp
+    #[arg(long)]
+    emit: Option<String>,
+
+    /// C# namespace for generated code (used with --emit csharp)
+    #[arg(long, default_value = "LitQuid.Generated")]
+    namespace: String,
 }
 
 /// Manages SSE client connections
@@ -61,6 +69,9 @@ fn main() {
 
     std::fs::create_dir_all(&args.output).expect("Failed to create output directory");
 
+    let emitters: Arc<Vec<Box<dyn TargetEmitter>>> =
+        Arc::new(build_emitters(args.emit.as_deref(), &args.namespace));
+
     // Shared state for SSE clients
     let sse_clients: Arc<Mutex<SseClients>> = Arc::new(Mutex::new(SseClients::new()));
     let sse_clients_watcher = Arc::clone(&sse_clients);
@@ -72,13 +83,14 @@ fn main() {
 
     // Initial processing of all templates
     println!("[litquid-watch] Initial processing...");
-    process_all_templates(&input_dir, &output_dir, &lit_import);
+    process_all_templates(&input_dir, &output_dir, &lit_import, &emitters);
     println!("[litquid-watch] Ready!");
 
     // Start file watcher in a thread
     let watcher_input = input_dir.clone();
     let watcher_output = output_dir.clone();
     let watcher_lit_import = lit_import.clone();
+    let watcher_emitters = Arc::clone(&emitters);
     thread::spawn(move || {
         let (tx, rx) = channel();
 
@@ -138,18 +150,38 @@ fn main() {
                                 }
                             };
 
-                            let output_path = watcher_output
+                            let output_js_path = watcher_output
                                 .join(relative_path)
                                 .with_extension("template.js");
+                            let output_json_path = watcher_output
+                                .join(relative_path)
+                                .with_extension("template.json");
 
-                            if let Some(parent) = output_path.parent() {
+                            if let Some(parent) = output_js_path.parent() {
                                 std::fs::create_dir_all(parent).ok();
                             }
 
+                            let template_name = canonical_path
+                                .file_stem()
+                                .and_then(|s| s.to_str())
+                                .unwrap_or("template");
+
                             match process_liquid_file(&canonical_path, Some(&watcher_lit_import)) {
-                                Ok(js_content) => {
-                                    std::fs::write(&output_path, js_content).ok();
-                                    println!("[litquid-watch] Generated: {:?}", output_path);
+                                Ok(parsed) => {
+                                    std::fs::write(&output_js_path, parsed.to_js_module()).ok();
+                                    std::fs::write(&output_json_path, parsed.to_json_manifest()).ok();
+                                    println!("[litquid-watch] Generated: {:?}", output_js_path);
+
+                                    for emitter in watcher_emitters.iter() {
+                                        let content = emitter.emit(template_name, &parsed);
+                                        let ext = format!("template.{}", emitter.file_extension());
+                                        let emit_path = watcher_output
+                                            .join(relative_path)
+                                            .with_extension(&ext);
+                                        std::fs::write(&emit_path, content).ok();
+                                        println!("[litquid-watch] Generated: {:?}", emit_path);
+                                    }
+
                                     any_success = true;
                                 }
                                 Err(e) => {
@@ -273,7 +305,12 @@ fn handle_sse_connection(request: tiny_http::Request, sse_clients: Arc<Mutex<Sse
     }
 }
 
-fn process_all_templates(input: &PathBuf, output: &PathBuf, lit_import: &str) {
+fn process_all_templates(
+    input: &PathBuf,
+    output: &PathBuf,
+    lit_import: &str,
+    emitters: &[Box<dyn TargetEmitter>],
+) {
     for entry in walkdir::WalkDir::new(input)
         .into_iter()
         .filter_map(|e| e.ok())
@@ -281,16 +318,31 @@ fn process_all_templates(input: &PathBuf, output: &PathBuf, lit_import: &str) {
     {
         let input_path = entry.path();
         let relative_path = input_path.strip_prefix(input).unwrap();
-        let output_path = output.join(relative_path).with_extension("template.js");
+        let template_name = input_path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("template");
 
-        if let Some(parent) = output_path.parent() {
+        let output_js_path = output.join(relative_path).with_extension("template.js");
+        let output_json_path = output.join(relative_path).with_extension("template.json");
+
+        if let Some(parent) = output_js_path.parent() {
             std::fs::create_dir_all(parent).ok();
         }
 
         match process_liquid_file(input_path, Some(lit_import)) {
-            Ok(js_content) => {
-                std::fs::write(&output_path, js_content).ok();
-                println!("[litquid-watch] Generated: {:?}", output_path);
+            Ok(parsed) => {
+                std::fs::write(&output_js_path, parsed.to_js_module()).ok();
+                std::fs::write(&output_json_path, parsed.to_json_manifest()).ok();
+                println!("[litquid-watch] Generated: {:?}", output_js_path);
+
+                for emitter in emitters {
+                    let content = emitter.emit(template_name, &parsed);
+                    let ext = format!("template.{}", emitter.file_extension());
+                    let emit_path = output.join(relative_path).with_extension(&ext);
+                    std::fs::write(&emit_path, content).ok();
+                    println!("[litquid-watch] Generated: {:?}", emit_path);
+                }
             }
             Err(e) => {
                 eprintln!("[litquid-watch] Error processing {:?}: {}", input_path, e);

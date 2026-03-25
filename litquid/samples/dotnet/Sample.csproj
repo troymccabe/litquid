@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../liquid/clientTemplateValue/dotnet/LitQuid.Liquid.ClientTemplateValue.csproj" />
+    <ProjectReference Include="../../../liquid/csr/dotnet/LitQuid.Liquid.Csr.csproj" />
   </ItemGroup>
 
   <!-- npm install and build on project build -->

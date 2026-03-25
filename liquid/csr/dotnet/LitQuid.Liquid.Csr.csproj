@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>LitQuid.Liquid.ClientTemplateValue</PackageId>
+    <PackageId>LitQuid.Liquid.Csr</PackageId>
     <Version>1.0.0</Version>
     <Authors>Troy McCabe</Authors>
     <Description>LitQuid Liquid filter for marking client-side template values</Description>

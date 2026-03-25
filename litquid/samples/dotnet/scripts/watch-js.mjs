@@ -27,6 +27,8 @@ async function build() {
                     bundle: true,
                     format: 'esm',
                     minify: false,
+                    // Components live outside the npm root; tell esbuild where packages are.
+                    nodePaths: [path.join(rootDir, 'node_modules')],
                 });
             }
         }

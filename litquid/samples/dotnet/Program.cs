@@ -19,8 +19,8 @@ builder.Services.AddScoped<TemplateService>();
 
 var app = builder.Build();
 
-// Register the ClientTemplateValue filter with DotLiquid
-ClientTemplateValue.Register();
+// Register the csr filter with DotLiquid
+CsrFilter.Register();
 
 // Middleware
 app.UseCors();

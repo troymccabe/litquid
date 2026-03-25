@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.litquid</groupId>
-    <artifactId>litquid-liquid-clienttemplatevalue</artifactId>
+    <artifactId>litquid-liquid-csr</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>LitQuid Liquid ClientTemplateValue Filter</name>
+    <name>LitQuid Liquid csr Filter</name>
     <description>LitQuid Liquid filter for marking client-side template values</description>
 
     <properties>

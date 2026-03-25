@@ -1,41 +1,236 @@
+/* ── Reset / base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
     font-family: system-ui, -apple-system, sans-serif;
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+    margin: 0;
+    padding: 0 1rem 3rem;
+    background: #f5f5f5;
+    color: #222;
 }
 
-h1 {
-    color: #333;
+/* ── Site header ──────────────────────────────────────────────────────────── */
+.site-header {
+    max-width: 900px;
+    margin: 2rem auto 0;
 }
 
-.demo-section {
-    margin: 2rem 0;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+.site-header h1 {
+    margin: 0 0 0.25rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
-.demo-section h2 {
-    margin-top: 0;
+.tagline {
+    margin: 0;
+    font-size: 0.9rem;
     color: #666;
 }
 
-.label {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
+/* ── Performance bar ──────────────────────────────────────────────────────── */
+.perf-bar {
+    max-width: 900px;
+    margin: 1.25rem auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
 }
 
-.label-ssr {
+.perf-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.perf-ssr {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-color: #c8e6c9;
+}
+
+.perf-hydration {
+    background: #e3f2fd;
+    color: #1565c0;
+    border-color: #bbdefb;
+    transition: background 0.3s;
+}
+
+.perf-hydration.ready {
+    background: #bbdefb;
+}
+
+.perf-gen {
+    background: #ede7f6;
+    color: #4527a0;
+    border-color: #d1c4e9;
+}
+
+.perf-note {
+    background: #fff8e1;
+    color: #f57f17;
+    border-color: #ffe082;
+}
+
+/* ── Controls ─────────────────────────────────────────────────────────────── */
+.demo-controls {
+    max-width: 900px;
+    margin: 1.25rem auto 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.control-btn {
+    padding: 0.4rem 1rem;
+    border: 1.5px solid #0066cc;
+    border-radius: 6px;
+    background: #fff;
+    color: #0066cc;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.control-btn:hover:not(:disabled) {
+    background: #0066cc;
+    color: #fff;
+}
+
+.control-btn:disabled {
+    border-color: #ccc;
+    color: #999;
+    cursor: default;
+}
+
+.control-hint {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* ── Demo sections ────────────────────────────────────────────────────────── */
+.demo-section {
+    max-width: 900px;
+    margin: 2rem auto 0;
+    padding: 1.25rem 1.5rem;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+}
+
+.section-header {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+}
+
+.section-header h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.section-header p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.5;
+}
+
+/* ── Inline render-strategy tags (used inside section descriptions) ────────── */
+.tag-ssr  { color: #2e7d32; font-weight: 700; }
+.tag-gen  { color: #4527a0; font-weight: 700; }
+.tag-csr  { color: #e65100; font-weight: 700; }
+
+/* ── Badges (section header pill) ────────────────────────────────────────── */
+.badge {
+    flex-shrink: 0;
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 5px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 0.15rem;
+}
+
+.badge-ssr {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-csr {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.badge-gen {
+    background: #ede7f6;
+    color: #4527a0;
+}
+
+.badge-mixed {
     background: #e3f2fd;
     color: #1565c0;
 }
 
-.label-csr {
+/* ── Card grid ────────────────────────────────────────────────────────────── */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.75rem;
+}
+
+/* Stat cards are wider — 2 columns on narrow, up to 4 on wide viewports */
+.card-grid--stats {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+/* ── Card wrap — render-strategy indicator label ──────────────────────────── */
+/* Each card is wrapped in <div class="card-wrap" data-render="SSR · Liquid">  */
+/* A small label is rendered below the card using a CSS ::after pseudo-element. */
+.card-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.card-wrap::after {
+    content: attr(data-render);
+    display: block;
+    text-align: center;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    align-self: center;
+}
+
+.card-wrap[data-render="SSR · Liquid"]::after {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.card-wrap[data-render="SSR · Generated"]::after {
+    background: #ede7f6;
+    color: #4527a0;
+    border: 1px solid #d1c4e9;
+}
+
+.card-wrap[data-render="CSR"]::after {
     background: #fff3e0;
     color: #e65100;
+    border: 1px solid #ffe0b2;
 }
